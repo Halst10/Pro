@@ -70,8 +70,12 @@
         // Function to fetch data from the ESP32 backend
         async function fetchData() {
             try {
-                const response = await fetch('http://192.168.100.233/data'); // Replace <ESP32_IP> with the ESP32's IP address
+                // Fetch data from the ESP32 backend
+                const response = await fetch('http://192.168.100.233/data');
                 const data = await response.json();
+
+                // Debugging: Log the fetched data to the console
+                console.log("Fetched data:", data);
 
                 // Update seat status
                 document.getElementById('S1').className = 'seat ' + (data.seat1 ? 'occupied' : '');
@@ -86,7 +90,7 @@
                 // Update GPS coordinates and map
                 const lat = parseFloat(data.lat);
                 const lng = parseFloat(data.lng);
-                if (!map) {
+                if (!window.map) {
                     initMap(lat, lng); // Initialize map on first load
                 } else {
                     marker.setLatLng([lat, lng]); // Update marker position
