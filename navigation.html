@@ -1,67 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bus Tracking System</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="navigation.css" />
-  </head>
-  <body>
+</head>
+<body>
     <div class="sidebar">
-      <h1>Bus Seat Status</h1>
-      <div class="bus-container" id="bus-seats">
-        <div class="driver-seat">Driver</div>
-      </div>
-      <div class="passenger-count" id="passenger-count">
-        <h2>Passenger Count</h2>
-        <div>Occupied Seats: <span id="occupied-count">0</span></div>
-        <div>Available Seats: <span id="available-count">0</span></div>
-      </div>
+        <h1>Bus Seat Status</h1>
+        <div class="bus-container" id="bus-seats">
+            <div class="driver-seat">Driver</div>
+            <div id="seat1" class="seat">Seat 1</div>
+            <div id="seat2" class="seat">Seat 2</div>
+            <div id="seat3" class="seat">Seat 3</div>
+        </div>
+        <div class="passenger-count" id="passenger-count">
+            <h2>Passenger Count</h2>
+            <div>Occupied Seats: <span id="occupied-count">0</span></div>
+            <div>Available Seats: <span id="available-count">0</span></div>
+        </div>
     </div>
     <div class="main-content">
-      <div class="map">
-        <div id="map"></div>
-      </div>
-      <div class="info-container">
-        <div class="schedule-container">
-          <h2>Bus Schedule</h2>
-          <table class="schedule-table">
-            <tr>
-              <th>Time</th>
-              <th>Station</th>
-              <th>Status</th>
-            </tr>
-            <tr>
-              <td>08:00 AM</td>
-              <td>Main Station</td>
-              <td>Departed</td>
-            </tr>
-            <tr>
-              <td>08:15 AM</td>
-              <td>City Center</td>
-              <td>Arrived</td>
-            </tr>
-            <tr>
-              <td>08:30 AM</td>
-              <td>University</td>
-              <td>On Time</td>
-            </tr>
-            <tr>
-              <td>08:45 AM</td>
-              <td>Main Station</td>
-              <td>Upcoming</td>
-            </tr>
-          </table>
+        <div class="map">
+            <div id="map"></div>
         </div>
-        <div class="temperature-container">
-          <h2>Current Temperature</h2>
-          <div class="temperature-value">22°C</div>
+        <div class="info-container">
+            <div class="schedule-container">
+                <h2>Bus Schedule</h2>
+                <table class="schedule-table">
+                    <tr>
+                        <th>Time</th>
+                        <th>Station</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>08:00 AM</td>
+                        <td>Main Station</td>
+                        <td>Departed</td>
+                    </tr>
+                    <tr>
+                        <td>08:15 AM</td>
+                        <td>City Center</td>
+                        <td>Arrived</td>
+                    </tr>
+                    <tr>
+                        <td>08:30 AM</td>
+                        <td>University</td>
+                        <td>On Time</td>
+                    </tr>
+                    <tr>
+                        <td>08:45 AM</td>
+                        <td>Main Station</td>
+                        <td>Upcoming</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="temperature-container">
+                <h2>Current Temperature</h2>
+                <div class="temperature-value">22°C</div>
+            </div>
         </div>
-      </div>
     </div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="navigation.js"></script>
-  </body>
+    <script>
+        // Initialize the map
+        let map;
+        let marker;
+
+        function initMap(lat, lng) {
+            map = L.map('map').setView([lat, lng], 15); // Set initial view to bus location
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add a marker for the bus
+            marker = L.marker([lat, lng]).addTo(map)
+                .bindPopup('Bus Location');
+        }
+
+        // Function to fetch data from the ESP32 backend
+        async function fetchData() {
+            try {
+                const response = await fetch('http://<ESP32_IP>/data'); // Replace <ESP32_IP> with the ESP32's IP address
+                const data = await response.json();
+
+                // Update seat status
+                document.getElementById('seat1').className = 'seat ' + (data.seat1 ? 'occupied' : 'empty');
+                document.getElementById('seat2').className = 'seat ' + (data.seat2 ? 'occupied' : 'empty');
+                document.getElementById('seat3').className = 'seat ' + (data.seat3 ? 'occupied' : 'empty');
+
+                // Update passenger count
+                const occupiedCount = [data.seat1, data.seat2, data.seat3].filter(seat => seat).length;
+                document.getElementById('occupied-count').innerText = occupiedCount;
+                document.getElementById('available-count').innerText = 3 - occupiedCount;
+
+                // Update GPS coordinates and map
+                const lat = parseFloat(data.lat);
+                const lng = parseFloat(data.lng);
+                if (!map) {
+                    initMap(lat, lng); // Initialize map on first load
+                } else {
+                    marker.setLatLng([lat, lng]); // Update marker position
+                    map.setView([lat, lng]); // Center map on new location
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Fetch data every second
+        setInterval(fetchData, 1000);
+    </script>
+</body>
 </html>
