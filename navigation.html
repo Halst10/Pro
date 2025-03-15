@@ -13,9 +13,9 @@
         <h1>Bus Seat Status</h1>
         <div class="bus-container" id="bus-seats">
             <div class="driver-seat">Driver</div>
-            <div id="seat1" class="seat">Seat 1</div>
-            <div id="seat2" class="seat">Seat 2</div>
-            <div id="seat3" class="seat">Seat 3</div>
+            <div id="S1" class="seat">S1</div>
+            <div id="S2" class="seat">S2</div>
+            <div id="S3" class="seat">S3</div>
         </div>
         <div class="passenger-count" id="passenger-count">
             <h2>Passenger Count</h2>
@@ -88,9 +88,9 @@
                 const data = await response.json();
 
                 // Update seat status
-                document.getElementById('seat1').className = 'seat ' + (data.seat1 ? 'occupied' : 'empty');
-                document.getElementById('seat2').className = 'seat ' + (data.seat2 ? 'occupied' : 'empty');
-                document.getElementById('seat3').className = 'seat ' + (data.seat3 ? 'occupied' : 'empty');
+                document.getElementById('S1').className = 'seat ' + (data.seat1 ? 'occupied' : 'empty');
+                document.getElementById('S2').className = 'seat ' + (data.seat2 ? 'occupied' : 'empty');
+                document.getElementById('S3').className = 'seat ' + (data.seat3 ? 'occupied' : 'empty');
 
                 // Update passenger count
                 const occupiedCount = [data.seat1, data.seat2, data.seat3].filter(seat => seat).length;
