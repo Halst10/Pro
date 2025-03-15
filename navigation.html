@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bus Tracking System</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="assets/css/navigation.css" />
+  </head>
+  <body>
+    <div class="sidebar">
+      <h1>Bus Seat Status</h1>
+      <div class="bus-container" id="bus-seats">
+        <div class="driver-seat">Driver</div>
+      </div>
+      <div class="passenger-count" id="passenger-count">
+        <h2>Passenger Count</h2>
+        <div>Occupied Seats: <span id="occupied-count">0</span></div>
+        <div>Available Seats: <span id="available-count">0</span></div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="map">
+        <div id="map"></div>
+      </div>
+      <div class="info-container">
+        <div class="schedule-container">
+          <h2>Bus Schedule</h2>
+          <table class="schedule-table">
+            <tr>
+              <th>Time</th>
+              <th>Station</th>
+              <th>Status</th>
+            </tr>
+            <tr>
+              <td>08:00 AM</td>
+              <td>Main Station</td>
+              <td>Departed</td>
+            </tr>
+            <tr>
+              <td>08:15 AM</td>
+              <td>City Center</td>
+              <td>Arrived</td>
+            </tr>
+            <tr>
+              <td>08:30 AM</td>
+              <td>University</td>
+              <td>On Time</td>
+            </tr>
+            <tr>
+              <td>08:45 AM</td>
+              <td>Main Station</td>
+              <td>Upcoming</td>
+            </tr>
+          </table>
+        </div>
+        <div class="temperature-container">
+          <h2>Current Temperature</h2>
+          <div class="temperature-value">22°C</div>
+        </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="assets/js/navigation.js"></script>
+  </body>
+</html>
