@@ -8,28 +8,11 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="navigation.css" />
     <style>
-        /* Additional CSS for seat status and layout */
-        .bus-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 columns for seats */
-            gap: 10px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 10px;
-            border: 2px solid #000; /* Border for the bus */
-        }
-        .driver-seat {
-            grid-column: 1 / -1; /* Driver seat spans all columns */
-            text-align: center;
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-        }
         .seat {
             display: inline-block;
             width: 50px;
             height: 50px;
+            margin: 5px;
             text-align: center;
             line-height: 50px;
             font-weight: bold;
@@ -41,6 +24,10 @@
         .seat.occupied {
             background-color: red; /* Occupied seats are red */
         }
+        #map {
+            height: 400px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -48,17 +35,9 @@
         <h1>Bus Seat Status</h1>
         <div class="bus-container" id="bus-seats">
             <div class="driver-seat">Driver</div>
-            <!-- Functional seats (S1, S2, S3) -->
             <div id="S1" class="seat">S1</div>
             <div id="S2" class="seat">S2</div>
             <div id="S3" class="seat">S3</div>
-            <!-- Additional seats (for design only) -->
-            <div class="seat">S4</div>
-            <div class="seat">S5</div>
-            <div class="seat">S6</div>
-            <div class="seat">S7</div>
-            <div class="seat">S8</div>
-            <div class="seat">S9</div>
         </div>
         <div class="passenger-count" id="passenger-count">
             <h2>Passenger Count</h2>
@@ -69,42 +48,6 @@
     <div class="main-content">
         <div class="map">
             <div id="map"></div>
-        </div>
-        <div class="info-container">
-            <div class="schedule-container">
-                <h2>Bus Schedule</h2>
-                <table class="schedule-table">
-                    <tr>
-                        <th>Time</th>
-                        <th>Station</th>
-                        <th>Status</th>
-                    </tr>
-                    <tr>
-                        <td>08:00 AM</td>
-                        <td>Main Station</td>
-                        <td>Departed</td>
-                    </tr>
-                    <tr>
-                        <td>08:15 AM</td>
-                        <td>City Center</td>
-                        <td>Arrived</td>
-                    </tr>
-                    <tr>
-                        <td>08:30 AM</td>
-                        <td>University</td>
-                        <td>On Time</td>
-                    </tr>
-                    <tr>
-                        <td>08:45 AM</td>
-                        <td>Main Station</td>
-                        <td>Upcoming</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="temperature-container">
-                <h2>Current Temperature</h2>
-                <div class="temperature-value">22°C</div>
-            </div>
         </div>
     </div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -127,10 +70,10 @@
         // Function to fetch data from the ESP32 backend
         async function fetchData() {
             try {
-                const response = await fetch('http://192.168.100.233/data'); // Replace <ESP32_IP> with the ESP32's IP address
+                const response = await fetch('http://<ESP32_IP>/data'); // Replace <ESP32_IP> with the ESP32's IP address
                 const data = await response.json();
 
-                // Update seat status (only S1, S2, S3 are functional)
+                // Update seat status
                 document.getElementById('S1').className = 'seat ' + (data.seat1 ? 'occupied' : '');
                 document.getElementById('S2').className = 'seat ' + (data.seat2 ? 'occupied' : '');
                 document.getElementById('S3').className = 'seat ' + (data.seat3 ? 'occupied' : '');
