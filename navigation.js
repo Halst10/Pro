@@ -2,6 +2,15 @@ document.addEventListener("DOMContentLoaded", () => {
     let map;
     let busMarker;
 
+    function initMap(lat = 0, lng = 0) {
+        map = L.map('map').setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        busMarker = L.marker([lat, lng]).addTo(map).bindPopup('Bus Location');
+    }
+
     async function fetchData() {
         try {
             const response = await fetch('http://192.168.100.233/data');
@@ -10,7 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
             updateSeatStatus(data);
             updatePassengerCount(data);
-            updateMap(data.lat, data.lng);
+
+            if (data.lat !== "0.0" && data.lng !== "0.0") {
+                updateMap(parseFloat(data.lat), parseFloat(data.lng));
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -28,24 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('available-count').innerText = 3 - occupiedCount;
     }
 
-    function initMap(lat, lng) {
-        map = L.map('map').setView([lat, lng], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        busMarker = L.marker([lat, lng]).addTo(map).bindPopup('Bus Location');
-    }
-
     function updateMap(lat, lng) {
-        const latitude = parseFloat(lat);
-        const longitude = parseFloat(lng);
-
         if (!map) {
-            initMap(latitude, longitude);
+            initMap(lat, lng);
         } else {
-            busMarker.setLatLng([latitude, longitude]);
-            map.setView([latitude, longitude]);
+            busMarker.setLatLng([lat, lng]);
+            map.setView([lat, lng]);
         }
     }
 
