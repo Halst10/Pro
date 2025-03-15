@@ -1,55 +1,64 @@
+// Function to fetch data from ESP32 backend
+async function fetchData() {
+    try {
+        console.log("Fetching data from ESP32...");
+        const response = await fetch('http://192.168.100.233/data');
+        if (!response.ok) throw new Error("Network response was not ok");
+        
+        const data = await response.json();
+        console.log("Fetched data:", data);
 
-      const seatsContainer = document.getElementById("bus-seats");
-      const occupiedCount = document.getElementById("occupied-count");
-      const availableCount = document.getElementById("available-count");
+        // Update seat status
+        updateSeatStatus(data);
 
-      // Generate random seat statuses
-      const seats = Array.from({ length: 20 }, (_, i) => ({
-        id: i + 1,
-        occupied: Math.random() < 0.5,
-      }));
+        // Update passenger count
+        updatePassengerCount(data);
 
-      // Function to update passenger count
-      function updatePassengerCount() {
-        const occupied = seats.filter((seat) => seat.occupied).length;
-        const available = seats.length - occupied;
-        occupiedCount.textContent = occupied;
-        availableCount.textContent = available;
-      }
+        // Update GPS coordinates and map
+        updateMap(data.lat, data.lng);
 
-      // Render seats and update count
-      seats.forEach((seat) => {
-        const seatDiv = document.createElement("div");
-        seatDiv.className = `seat ${seat.occupied ? "occupied" : "available"}`;
-        seatDiv.innerText = `S${seat.id}`;
-        seatsContainer.appendChild(seatDiv);
-      });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
 
-      // Initial count update
-      updatePassengerCount();
+// Function to update seat status
+function updateSeatStatus(data) {
+    document.getElementById('S1').className = 'seat ' + (data.seat1 ? 'occupied' : 'available');
+    document.getElementById('S2').className = 'seat ' + (data.seat2 ? 'occupied' : 'available');
+    document.getElementById('S3').className = 'seat ' + (data.seat3 ? 'occupied' : 'available');
+}
 
-      // Map setup
-      const busLocation = [35.5613, 45.4306];
-      const stations = [
-        {
-          id: 1,
-          name: "Sulaymaniyah Main Station",
-          location: [35.5625, 45.4331],
-        },
-        { id: 2, name: "City Center Station", location: [35.565, 45.438] },
-        { id: 3, name: "University Station", location: [35.5678, 45.4253] },
-      ];
+// Function to update passenger count
+function updatePassengerCount(data) {
+    const occupiedCount = [data.seat1, data.seat2, data.seat3].filter(seat => seat).length;
+    document.getElementById('occupied-count').innerText = occupiedCount;
+    document.getElementById('available-count').innerText = 3 - occupiedCount;
+}
 
-      const map = L.map("map").setView(busLocation, 13);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+// Function to initialize the map
+function initMap(lat, lng) {
+    console.log("Initializing map...");
+    window.map = L.map('map').setView([lat, lng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(window.map);
 
-      const busMarker = L.marker(busLocation).addTo(map);
-      busMarker.bindPopup("Bus is here").openPopup();
+    window.marker = L.marker([lat, lng]).addTo(window.map).bindPopup('Bus Location');
+}
 
-      stations.forEach((station) => {
-        L.marker(station.location).addTo(map).bindPopup(station.name);
-      });
-    
+// Function to update bus location on the map
+function updateMap(lat, lng) {
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lng);
+
+    if (!window.map) {
+        initMap(latitude, longitude);
+    } else {
+        window.marker.setLatLng([latitude, longitude]);
+        window.map.setView([latitude, longitude]);
+    }
+}
+
+// Fetch data every second
+setInterval(fetchData, 1000);
