@@ -1,53 +1,55 @@
-document.addEventListener("DOMContentLoaded", () => {
-    let map;
-    let busMarker;
 
-    function initMap(lat = 0, lng = 0) {
-        map = L.map('map').setView([lat, lng], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+      const seatsContainer = document.getElementById("bus-seats");
+      const occupiedCount = document.getElementById("occupied-count");
+      const availableCount = document.getElementById("available-count");
 
-        busMarker = L.marker([lat, lng]).addTo(map).bindPopup('Bus Location');
-    }
+      // Generate random seat statuses
+      const seats = Array.from({ length: 20 }, (_, i) => ({
+        id: i + 1,
+        occupied: Math.random() < 0.5,
+      }));
 
-    async function fetchData() {
-        try {
-            const response = await fetch('http://192.168.100.233/data');
-            if (!response.ok) throw new Error("Network error");
+      // Function to update passenger count
+      function updatePassengerCount() {
+        const occupied = seats.filter((seat) => seat.occupied).length;
+        const available = seats.length - occupied;
+        occupiedCount.textContent = occupied;
+        availableCount.textContent = available;
+      }
 
-            const data = await response.json();
-            updateSeatStatus(data);
-            updatePassengerCount(data);
+      // Render seats and update count
+      seats.forEach((seat) => {
+        const seatDiv = document.createElement("div");
+        seatDiv.className = `seat ${seat.occupied ? "occupied" : "available"}`;
+        seatDiv.innerText = `S${seat.id}`;
+        seatsContainer.appendChild(seatDiv);
+      });
 
-            if (data.lat !== "0.0" && data.lng !== "0.0") {
-                updateMap(parseFloat(data.lat), parseFloat(data.lng));
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
+      // Initial count update
+      updatePassengerCount();
 
-    function updateSeatStatus(data) {
-        document.getElementById('S1').className = 'seat ' + (data.seat1 ? 'occupied' : 'available');
-        document.getElementById('S2').className = 'seat ' + (data.seat2 ? 'occupied' : 'available');
-        document.getElementById('S3').className = 'seat ' + (data.seat3 ? 'occupied' : 'available');
-    }
+      // Map setup
+      const busLocation = [35.5613, 45.4306];
+      const stations = [
+        {
+          id: 1,
+          name: "Sulaymaniyah Main Station",
+          location: [35.5625, 45.4331],
+        },
+        { id: 2, name: "City Center Station", location: [35.565, 45.438] },
+        { id: 3, name: "University Station", location: [35.5678, 45.4253] },
+      ];
 
-    function updatePassengerCount(data) {
-        const occupiedCount = [data.seat1, data.seat2, data.seat3].filter(seat => seat).length;
-        document.getElementById('occupied-count').innerText = occupiedCount;
-        document.getElementById('available-count').innerText = 3 - occupiedCount;
-    }
+      const map = L.map("map").setView(busLocation, 13);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
 
-    function updateMap(lat, lng) {
-        if (!map) {
-            initMap(lat, lng);
-        } else {
-            busMarker.setLatLng([lat, lng]);
-            map.setView([lat, lng]);
-        }
-    }
+      const busMarker = L.marker(busLocation).addTo(map);
+      busMarker.bindPopup("Bus is here").openPopup();
 
-    setInterval(fetchData, 1000);
-});
+      stations.forEach((station) => {
+        L.marker(station.location).addTo(map).bindPopup(station.name);
+      });
+    
