@@ -127,7 +127,7 @@
         // Function to fetch data from the ESP32 backend
         async function fetchData() {
             try {
-                const response = await fetch('http://<ESP32_IP>/data'); // Replace <ESP32_IP> with the ESP32's IP address
+                const response = await fetch('http://192.168.100.233/data'); // Replace <ESP32_IP> with the ESP32's IP address
                 const data = await response.json();
 
                 // Update seat status (only S1, S2, S3 are functional)
