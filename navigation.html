@@ -6,7 +6,6 @@
     <title>Bus Tracking System</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="navigation.css" />
     <style>
         .seat {
             display: inline-block;
@@ -17,12 +16,12 @@
             line-height: 50px;
             font-weight: bold;
             color: white;
-            background-color: green; /* Available seats are green */
+            background-color: green;
             border-radius: 5px;
             cursor: pointer;
         }
         .seat.occupied {
-            background-color: red; /* Occupied seats are red */
+            background-color: red;
         }
         #map {
             height: 400px;
@@ -33,79 +32,25 @@
 <body>
     <div class="sidebar">
         <h1>Bus Seat Status</h1>
-<div class="bus-container" id="bus-seats">
-    <div class="driver-seat">Driver</div>
-    <div id="S1" class="seat available">S1</div>
-    <div id="S2" class="seat available">S2</div>
-    <div id="S3" class="seat available">S3</div>
-</div>
-
+        <div class="bus-container" id="bus-seats">
+            <div class="driver-seat">Driver</div>
+            <div id="S1" class="seat">S1</div>
+            <div id="S2" class="seat">S2</div>
+            <div id="S3" class="seat">S3</div>
+        </div>
+        <div class="passenger-count">
+            <h2>Passenger Count</h2>
+            <div>Occupied Seats: <span id="occupied-count">0</span></div>
+            <div>Available Seats: <span id="available-count">3</span></div>
+        </div>
+    </div>
     <div class="main-content">
         <div class="map">
             <div id="map"></div>
         </div>
     </div>
+    
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        // Initialize the map
-        let map;
-        let marker;
-
-        function initMap(lat, lng) {
-            console.log("Initializing map with lat:", lat, "lng:", lng);
-            window.map = L.map('map').setView([lat, lng], 15); // Set initial view to bus location
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(window.map);
-
-            // Add a marker for the bus
-            window.marker = L.marker([lat, lng]).addTo(window.map)
-                .bindPopup('Bus Location');
-        }
-
-        // Function to fetch data from the ESP32 backend
-        async function fetchData() {
-            try {
-                console.log("Fetching data from ESP32...");
-
-                // Fetch data from the ESP32 backend
-                const response = await fetch('http://192.168.100.233/data');
-                console.log("Response received:", response);
-
-                const data = await response.json();
-                console.log("Fetched data:", data);
-
-                // Update seat status
-                console.log("Updating seat status...");
-                document.getElementById('S1').className = 'seat ' + (data.seat1 ? 'occupied' : '');
-                document.getElementById('S2').className = 'seat ' + (data.seat2 ? 'occupied' : '');
-                document.getElementById('S3').className = 'seat ' + (data.seat3 ? 'occupied' : '');
-
-                // Update passenger count
-                console.log("Updating passenger count...");
-                const occupiedCount = [data.seat1, data.seat2, data.seat3].filter(seat => seat).length;
-                document.getElementById('occupied-count').innerText = occupiedCount;
-                document.getElementById('available-count').innerText = 3 - occupiedCount;
-
-                // Update GPS coordinates and map
-                console.log("Updating map...");
-                const lat = parseFloat(data.lat);
-                const lng = parseFloat(data.lng);
-                if (!window.map) {
-                    console.log("Initializing map...");
-                    initMap(lat, lng); // Initialize map on first load
-                } else {
-                    console.log("Updating marker position...");
-                    window.marker.setLatLng([lat, lng]); // Update marker position
-                    window.map.setView([lat, lng]); // Center map on new location
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
-
-        // Fetch data every second
-        setInterval(fetchData, 1000);
-    </script>
+    <script src="bus-tracking.js"></script>
 </body>
 </html>
