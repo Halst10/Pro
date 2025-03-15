@@ -11,11 +11,12 @@
         /* Additional CSS for seat status and layout */
         .bus-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 columns for seats */
+            grid-template-columns: repeat(2, 1fr); /* 2 columns for seats */
             gap: 10px;
             padding: 10px;
             background-color: #f0f0f0;
             border-radius: 10px;
+            border: 2px solid #000; /* Border for the bus */
         }
         .driver-seat {
             grid-column: 1 / -1; /* Driver seat spans all columns */
@@ -58,17 +59,6 @@
             <div class="seat">S7</div>
             <div class="seat">S8</div>
             <div class="seat">S9</div>
-            <div class="seat">S10</div>
-            <div class="seat">S11</div>
-            <div class="seat">S12</div>
-            <div class="seat">S13</div>
-            <div class="seat">S14</div>
-            <div class="seat">S15</div>
-            <div class="seat">S16</div>
-            <div class="seat">S17</div>
-            <div class="seat">S18</div>
-            <div class="seat">S19</div>
-            <div class="seat">S20</div>
         </div>
         <div class="passenger-count" id="passenger-count">
             <h2>Passenger Count</h2>
